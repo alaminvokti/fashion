@@ -318,13 +318,54 @@
     }
 
     function placeOrder() {
-        const orderContainer = document.getElementById('orderContainer');
-        const thankYouContainer = document.getElementById('thankYouContainer');
+    const data = {
+        name: document.getElementById('name').value,
+        address: document.getElementById('address').value,
+        phone: document.getElementById('phone').value,
+        size: document.getElementById('size').value,
+        totalPrice: document.getElementById('totalPrice').innerText.split(' ')[2], // Extracting the numeric value
+        deliveryOption: document.querySelector('input[name="delivery"]:checked').value,
+        products: []
+    };
 
-        // Hide the order form and show the thank-you message
-        orderContainer.style.display = 'none';
-        thankYouContainer.style.display = 'block';
+    for (let i = 1; i <= 3; i++) { // Adjust this based on the number of products
+        const optionNoHijab = document.getElementById(`option-${i}-no-hijab`);
+        const optionWithHijab = document.getElementById(`option-${i}-with-hijab`);
+        const quantityNoHijab = document.getElementById(`quantity-${i}-no-hijab`).value;
+        const quantityWithHijab = document.getElementById(`quantity-${i}-with-hijab`).value;
+
+        if (optionNoHijab.checked && quantityNoHijab > 0) {
+            data.products.push({
+                name: `Borka ${i}`,
+                option: "No Hijab",
+                quantity: quantityNoHijab
+            });
+        }
+        if (optionWithHijab.checked && quantityWithHijab > 0) {
+            data.products.push({
+                name: `Borka ${i}`,
+                option: "With Hijab",
+                quantity: quantityWithHijab
+            });
+        }
     }
+
+    fetch("https://script.google.com/macros/s/AKfycbwUUND8_zxdNfMXzLRTEkofTQDfz413430k0cadx9dE/dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(response => {
+        if (response.status === "success") {
+            document.getElementById('orderContainer').style.display = 'none';
+            document.getElementById('thankYouContainer').style.display = 'block';
+        } else {
+            alert("Order submission failed");
+        }
+    });
+}
+
 </script>
 
 </body>
